@@ -1,0 +1,179 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+
+#define MAZE_SIZE 10
+
+void printMaze(char maze[MAZE_SIZE][MAZE_SIZE], int winstonX, int winstonY, int obrienX, int obrienY, int exitX, int exitY) {
+    for (int i = 0; i < MAZE_SIZE; i++) {
+        for (int j = 0; j < MAZE_SIZE; j++) {
+            if (i == winstonX && j == winstonY) {
+                printf("W ");
+            } else if (i == obrienX && j == obrienY) {
+                printf("O ");
+            } else if (i == exitX && j == exitY) {
+                printf("E ");
+            } else {
+                printf("%c ", maze[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+void generateMaze(char maze[MAZE_SIZE][MAZE_SIZE]) {
+    // Generate border
+    for (int i = 0; i < MAZE_SIZE; i++) {
+        for (int j = 0; j < MAZE_SIZE; j++) {
+            if (i == 0 || i == MAZE_SIZE - 1 || j == 0 || j == MAZE_SIZE - 1) {
+                maze[i][j] = '#';
+            } else {
+                maze[i][j] = ' ';
+            }
+        }
+    }
+
+    // Scatter '#'
+    for (int k = 0; k < 10; k++) { // Adjust density of scattered '#'
+        int x = rand() % (MAZE_SIZE - 2) + 1; // Exclude borders
+        int y = rand() % (MAZE_SIZE - 2) + 1;
+        maze[x][y] = '#';
+    }
+}
+
+int main() {
+    srand(time(0));
+
+    printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- \n");
+    printf("*-*- ");
+    printf("Welcome to 1984. THE MAZE!!!");
+    printf("*-*- \n");
+    printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-\n");
+    printf("Winston is lost in the maze and trying to find a way out.\n");
+    printf("Your job is to guide Winston to the exit while avoiding O'Brien!\n");
+
+    char maze[MAZE_SIZE][MAZE_SIZE];
+    generateMaze(maze);
+
+    int winstonX = 1, winstonY = 1;
+    int obrienX = MAZE_SIZE - 2, obrienY = MAZE_SIZE - 2;
+    int exitX = MAZE_SIZE - 2, exitY = MAZE_SIZE - 1;
+    int hunger = 0, tiredness = 0;
+
+    while (!(winstonX == exitX && winstonY == exitY)) {
+        // Update hunger and tiredness
+        hunger++;
+        tiredness++;
+
+        // O'Brien moves towards Winston
+        if (winstonX < obrienX) {
+            obrienX--;
+        } else if (winstonX > obrienX) {
+            obrienX++;
+        }
+        if (winstonY < obrienY) {
+            obrienY--;
+        } else if (winstonY > obrienY) {
+            obrienY++;
+        }
+
+        printMaze(maze, winstonX, winstonY, obrienX, obrienY, exitX, exitY);
+        printf("Hunger: %d  Tiredness: %d\n", hunger, tiredness);
+        printf("Which direction would you like to move?\n");
+        printf("W. Up\n");
+        printf("A. Left\n");
+        printf("S. Down\n");
+        printf("D. Right\n");
+        printf("E. Eat\n");
+        printf("F. Eat\n");
+        printf("Q. Quit\n");
+        printf("What would you like to do?\n");
+
+        char choice;
+        scanf(" %c", &choice);
+
+        switch (choice) {
+            case 'W':
+                if (winstonX > 1 && maze[winstonX - 1][winstonY] != '#') {
+                    winstonX--;
+                }
+                break;
+            case 'A':
+                if (winstonY > 1 && maze[winstonX][winstonY - 1] != '#') {
+                    winstonY--;
+                }
+                break;
+            case 'S':
+                if (winstonX < MAZE_SIZE - 2 && maze[winstonX + 1][winstonY] != '#') {
+                    winstonX++;
+                }
+                break;
+            case 'D':
+                if (winstonY < MAZE_SIZE - 2 && maze[winstonX][winstonY + 1] != '#') {
+                    winstonY++;
+                }
+                break;
+            case 'E':
+                printf("Winston ate a snack.\n");
+                hunger = 0;
+                tiredness -= 5; // Eating reduces tiredness
+                break;
+            case 'F':
+            printf("Winston is now fully rested\n");
+            tiredness = 0;
+            break;
+            case 'Q':
+                printf("Quitting the game.\n");
+                return 0;
+            default:
+                printf("Invalid input. Please try again.\n");
+                continue;
+        }
+
+        // Check hunger and tiredness
+        if (hunger >= 6) {
+            printf("Winston passed out from hunger\n");
+            sleep(2);
+            printf("O'Brien has found Winston, lying on the floor...\n");
+            sleep(2);
+            printf("O'Brien's Guards brought Winston to Room 101\n");
+            printf("Where they woke him up.\n");
+            sleep(2);
+            printf("Winston is now in room 101\n");
+            sleep(2);
+            printf("O'Brien is now bringing in the rats \n");
+            sleep(2);
+            printf("Winston is begging for mersy!\n");
+            sleep(2);
+            printf("O'Brien dumps in the rats into a helmet and puts the helmet onto Winston...\n");
+            sleep(2);
+            printf("After so much suffering, Winston is now dead...");
+            break;
+        }
+        if (tiredness >= 10) {
+            printf("Winston passed out from exhaustion\n");
+             sleep(3);
+            printf("O'Brien found Winston... dying from exhaustion\n");
+            sleep(2);
+            printf("O'Brien smirks at Winston and orders his guards to bring him to room 101\n");
+            sleep(2);
+            printf("Winston is now in room 101\n");
+            sleep(2);
+            printf("O'Brien is now bringing in the rats \n");
+            sleep(2);
+            printf("Winston is begging for mersy!\n");
+            sleep(2);
+            printf("O'Brien dumps in the rats into a helmet and puts the helmet onto Winston...\n");
+            sleep(2);
+            printf("After so much suffering, Winston is now dead...");
+            break;
+        }
+    }
+
+    if (winstonX == exitX && winstonY == exitY) {
+        printf("Congratulations! You found the exit and Winston escaped the maze!\n");
+    }
+
+    return 0;
+}
